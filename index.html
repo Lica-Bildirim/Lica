@@ -1,1 +1,757 @@
 
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LightCase — Smart Notification Light</title>
+<meta name="description" content="Never miss a notification again. LightCase turns your camera flash and screen edges into a smart notification system.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --c:#00E5FF;
+  --c2:rgba(0,229,255,0.5);
+  --c3:rgba(0,229,255,0.08);
+  --bg:#04070E;
+  --bg2:#080D18;
+  --bg3:#0C1220;
+  --bd:#162030;
+  --bd2:#1E2D40;
+  --tx:#B0C4D4;
+  --mt:#344556;
+  --gr:#00E5A0;
+  --or:#FF9500;
+  --rd:#FF3D55;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--tx);
+  font-family:'Exo 2',sans-serif;
+  overflow-x:hidden;
+}
+
+/* noise texture */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:0.4;
+}
+
+/* ambient */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 5% 0%,rgba(0,229,255,0.07) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 70% at 95% 100%,rgba(0,150,180,0.05) 0%,transparent 55%);
+  pointer-events:none;z-index:0;
+}
+
+.z{position:relative;z-index:1;}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px;}
+
+/* ═══════════════ NAV ═══════════════ */
+nav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(4,7,14,0.88);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--bd);
+}
+.nav-in{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:14px 0;
+}
+.logo{
+  font-family:'Orbitron',monospace;
+  font-weight:900;font-size:18px;
+  color:var(--c);letter-spacing:3px;
+  text-decoration:none;
+  text-shadow:0 0 20px var(--c2);
+}
+.logo em{color:rgba(0,229,255,0.35);font-style:normal;}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.lang-btn{
+  padding:6px 14px;
+  background:var(--c3);
+  border:1px solid rgba(0,229,255,0.2);
+  border-radius:20px;
+  color:var(--c);
+  font-family:'Exo 2',sans-serif;
+  font-size:12px;font-weight:600;
+  letter-spacing:1px;cursor:pointer;
+  transition:all .2s;
+}
+.lang-btn:hover{background:rgba(0,229,255,0.15);}
+.nav-cta{
+  padding:8px 20px;
+  background:var(--c);
+  color:#04070E;
+  font-family:'Orbitron',monospace;
+  font-size:10px;font-weight:700;
+  letter-spacing:2px;
+  border:none;border-radius:4px;
+  cursor:pointer;text-decoration:none;
+  transition:all .2s;
+  box-shadow:0 0 20px rgba(0,229,255,0.2);
+}
+.nav-cta:hover{background:#fff;box-shadow:0 0 30px rgba(0,229,255,0.5);}
+
+/* ═══════════════ HERO ═══════════════ */
+.hero{
+  min-height:95vh;
+  display:flex;align-items:center;
+  padding:60px 0 40px;
+}
+.hero-grid{
+  display:grid;
+  grid-template-columns:1.1fr 0.9fr;
+  gap:60px;align-items:center;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:5px 14px;
+  background:var(--c3);
+  border:1px solid rgba(0,229,255,0.18);
+  border-radius:20px;
+  font-size:10px;color:var(--c);
+  letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:22px;
+}
+.dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--c);
+  animation:blink 1.4s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 6px var(--c);}50%{opacity:0.2;box-shadow:none;}}
+
+h1{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(26px,4.5vw,54px);
+  font-weight:900;line-height:1.05;
+  color:#fff;margin-bottom:18px;
+}
+h1 .ac{
+  color:var(--c);
+  text-shadow:0 0 40px rgba(0,229,255,0.4);
+}
+.hero-sub{
+  font-size:17px;opacity:.75;
+  max-width:440px;margin-bottom:36px;
+  line-height:1.7;
+}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-main{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:15px 32px;
+  background:var(--c);color:#04070E;
+  font-family:'Orbitron',monospace;
+  font-size:11px;font-weight:700;letter-spacing:2px;
+  border:none;border-radius:5px;
+  text-decoration:none;cursor:pointer;
+  transition:all .25s;
+  box-shadow:0 0 30px rgba(0,229,255,0.25);
+}
+.btn-main:hover{background:#fff;box-shadow:0 0 50px rgba(0,229,255,0.55);transform:translateY(-2px);}
+.btn-sec{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 24px;
+  background:transparent;color:var(--c);
+  font-family:'Orbitron',monospace;
+  font-size:10px;font-weight:700;letter-spacing:2px;
+  border:1px solid rgba(0,229,255,0.25);
+  border-radius:5px;text-decoration:none;cursor:pointer;
+  transition:all .25s;
+}
+.btn-sec:hover{background:var(--c3);border-color:var(--c);}
+
+/* stats */
+.hero-stats{
+  display:flex;gap:32px;
+  margin-top:44px;
+  padding-top:32px;
+  border-top:1px solid var(--bd);
+}
+.stat-val{
+  font-family:'Orbitron',monospace;
+  font-size:22px;font-weight:700;
+  color:var(--c);margin-bottom:2px;
+}
+.stat-lbl{font-size:11px;color:var(--mt);letter-spacing:1px;text-transform:uppercase;}
+
+/* ═══════════════ PHONE MOCKUP ═══════════════ */
+.phone-wrap{
+  display:flex;align-items:center;
+  justify-content:center;
+  position:relative;
+}
+.phone{
+  width:220px;height:400px;
+  background:var(--bg2);
+  border:2px solid var(--bd2);
+  border-radius:40px;
+  position:relative;
+  box-shadow:
+    0 0 0 1px rgba(0,229,255,0.04),
+    0 50px 100px rgba(0,0,0,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.phone-screen{
+  position:absolute;
+  inset:10px;
+  background:var(--bg);
+  border-radius:30px;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:12px;
+}
+
+/* ── Kamera + glow ── */
+.camera-area{
+  position:absolute;
+  top:16px;
+  display:flex;align-items:center;justify-content:center;
+  z-index:10;
+}
+.camera-bump{
+  width:48px;height:48px;
+  border-radius:50%;
+  background:var(--bg2);
+  border:2px solid var(--bd2);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.camera-lens{
+  width:22px;height:22px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #1a2a3a, #050810);
+  border:1.5px solid #1E3040;
+  box-shadow:inset 0 0 6px rgba(0,229,255,0.15);
+}
+.camera-shine{
+  position:absolute;
+  top:5px;left:8px;
+  width:6px;height:6px;
+  border-radius:50%;
+  background:rgba(0,229,255,0.4);
+  filter:blur(2px);
+}
+
+/* glow rings sadece kamera etrafında */
+.glow-edge{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+}
+.ge1{
+  width:64px;height:64px;
+  border:2px solid var(--c);
+  animation:ge 2.2s ease-in-out infinite;
+}
+.ge2{
+  width:82px;height:82px;
+  border:1.5px solid rgba(0,229,255,0.4);
+  animation:ge 2.2s ease-in-out infinite .25s;
+}
+.ge3{
+  width:104px;height:104px;
+  border:1px solid rgba(0,229,255,0.15);
+  animation:ge 2.2s ease-in-out infinite .5s;
+}
+@keyframes ge{
+  0%,100%{opacity:.6;box-shadow:0 0 8px rgba(0,229,255,0.3);}
+  50%{opacity:1;box-shadow:0 0 22px rgba(0,229,255,0.7);}
+}
+
+/* notif card */
+.notif-card{
+  background:var(--bg3);
+  border:1px solid var(--bd2);
+  border-radius:14px;
+  padding:11px 16px;
+  width:155px;
+  margin-top:20px;
+  animation:float 3.5s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+
+.nc-app{
+  display:flex;align-items:center;gap:7px;
+  font-size:10px;color:var(--mt);
+  margin-bottom:5px;
+}
+.nc-dot{width:7px;height:7px;border-radius:50%;}
+.nc-txt{font-size:12px;color:var(--tx);}
+.nc-time{font-size:9px;color:var(--mt);margin-top:3px;}
+
+/* flash indicator */
+.flash-indicator{
+  position:absolute;
+  bottom:18px;
+  width:36px;height:36px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,0.9),rgba(255,220,100,0.6));
+  box-shadow:0 0 20px rgba(255,240,150,0.8),0 0 40px rgba(255,220,100,0.4);
+  animation:flash-blink 1.8s ease-in-out infinite;
+}
+@keyframes flash-blink{
+  0%,100%{opacity:.3;transform:scale(0.8);}
+  50%{opacity:1;transform:scale(1.1);}
+}
+
+/* orbiting dots */
+.orbit{
+  position:absolute;
+  width:340px;height:340px;
+  border-radius:50%;
+  border:1px dashed rgba(0,229,255,0.08);
+  animation:spin 20s linear infinite;
+}
+.orbit2{
+  position:absolute;
+  width:460px;height:460px;
+  border-radius:50%;
+  border:1px dashed rgba(0,229,255,0.04);
+  animation:spin 30s linear infinite reverse;
+}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.orb-dot{
+  position:absolute;
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--c);
+  box-shadow:0 0 10px var(--c);
+  top:-3.5px;left:50%;transform:translateX(-50%);
+}
+
+/* ═══════════════ DIVIDER ═══════════════ */
+.divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--bd2),transparent);
+}
+
+/* ═══════════════ SECTIONS ═══════════════ */
+section{padding:88px 0;}
+
+.sec-eyebrow{
+  font-family:'Orbitron',monospace;
+  font-size:9px;color:var(--c);
+  letter-spacing:4px;text-transform:uppercase;
+  margin-bottom:10px;opacity:.7;
+}
+.sec-title{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(18px,3vw,30px);
+  color:#fff;margin-bottom:14px;line-height:1.2;
+}
+.sec-sub{
+  color:var(--mt);font-size:15px;
+  max-width:500px;margin-bottom:52px;
+}
+
+/* ═══════════════ FEATURES ═══════════════ */
+.feat-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:2px;
+  background:var(--bd);
+  border:1px solid var(--bd);
+  border-radius:18px;
+  overflow:hidden;
+}
+.feat{
+  background:var(--bg2);
+  padding:30px 24px;
+  transition:background .2s;
+  cursor:default;
+}
+.feat:hover{background:var(--bg3);}
+.feat-ico{font-size:28px;margin-bottom:14px;}
+.feat h3{
+  font-family:'Orbitron',monospace;
+  font-size:10px;color:var(--c);
+  letter-spacing:1.5px;margin-bottom:9px;
+}
+.feat p{color:var(--mt);font-size:13px;line-height:1.6;}
+
+/* ═══════════════ HOW IT WORKS ═══════════════ */
+.steps-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:2px;
+  background:var(--bd);
+  border:1px solid var(--bd);
+  border-radius:18px;
+  overflow:hidden;
+  margin-top:48px;
+}
+.step{background:var(--bg2);padding:30px 24px;position:relative;}
+.step-n{
+  font-family:'Orbitron',monospace;
+  font-size:48px;font-weight:900;
+  color:rgba(0,229,255,0.07);
+  line-height:1;margin-bottom:14px;
+}
+.step h4{color:var(--c);font-size:13px;font-weight:600;margin-bottom:8px;}
+.step p{color:var(--mt);font-size:13px;}
+
+/* ═══════════════ PREMIUM ═══════════════ */
+.prem-grid{
+  display:grid;
+  grid-template-columns:1fr 380px;
+  gap:28px;align-items:start;
+}
+.prem-list{
+  background:var(--bg2);
+  border:1px solid var(--bd2);
+  border-radius:16px;overflow:hidden;
+}
+.pi{
+  display:flex;gap:16px;
+  padding:20px 24px;
+  border-bottom:1px solid var(--bd);
+  align-items:flex-start;
+  transition:background .2s;
+}
+.pi:last-child{border-bottom:none;}
+.pi:hover{background:var(--bg3);}
+.pi-ico{font-size:20px;width:32px;flex-shrink:0;text-align:center;margin-top:2px;}
+.pi h4{color:#fff;font-size:14px;font-weight:600;margin-bottom:3px;}
+.pi p{color:var(--mt);font-size:12px;}
+
+.price-card{
+  background:var(--bg2);
+  border:1px solid rgba(0,229,255,0.22);
+  border-radius:16px;padding:32px;
+  text-align:center;
+  position:sticky;top:80px;
+  box-shadow:0 0 60px rgba(0,229,255,0.05);
+}
+.price-tag{
+  font-family:'Orbitron',monospace;
+  font-size:54px;font-weight:900;
+  color:var(--c);line-height:1;
+  text-shadow:0 0 30px rgba(0,229,255,0.3);
+  margin-bottom:4px;
+}
+.price-note{color:var(--mt);font-size:12px;margin-bottom:24px;}
+.pf-list{text-align:left;margin:18px 0 26px;display:flex;flex-direction:column;gap:10px;}
+.pf{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--tx);}
+.pf::before{content:'✓';color:var(--gr);font-weight:700;flex-shrink:0;}
+.badge-free{
+  display:inline-block;
+  padding:3px 10px;
+  background:rgba(0,229,160,0.1);
+  border:1px solid rgba(0,229,160,0.2);
+  border-radius:20px;
+  font-size:10px;color:var(--gr);
+  letter-spacing:1px;
+  margin-top:12px;
+}
+
+/* ═══════════════ FOOTER ═══════════════ */
+footer{
+  border-top:1px solid var(--bd);
+  padding:32px 0;text-align:center;
+}
+footer p{color:var(--mt);font-size:12px;letter-spacing:.5px;}
+footer a{color:var(--c);text-decoration:none;}
+footer a:hover{text-decoration:underline;}
+
+/* ═══════════════ RESPONSIVE ═══════════════ */
+@media(max-width:800px){
+  .hero-grid{grid-template-columns:1fr;gap:40px;}
+  .phone-wrap{order:-1;}
+  .orbit,.orbit2{display:none;}
+  .feat-grid{grid-template-columns:1fr 1fr;}
+  .steps-grid{grid-template-columns:1fr;}
+  .prem-grid{grid-template-columns:1fr;}
+  .price-card{position:static;}
+  .hero-stats{gap:20px;}
+}
+@media(max-width:500px){
+  .feat-grid{grid-template-columns:1fr;}
+  h1{font-size:26px;}
+  .hero-btns{flex-direction:column;}
+  .btn-main,.btn-sec{justify-content:center;}
+  .hero-stats{flex-wrap:wrap;gap:16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ NAV ═══════════════════════════════════ -->
+<nav>
+  <div class="wrap z">
+    <div class="nav-in">
+      <a href="#" class="logo">LIGHT<em>CASE</em></a>
+      <div class="nav-right">
+        <button class="lang-btn" onclick="toggleLang()">EN / TR</button>
+        <a href="#premium" class="nav-cta" data-tr="Premium" data-en="Premium">Premium</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════ HERO ═══════════════════════════════════ -->
+<section id="home" style="padding:0;">
+  <div class="wrap z">
+    <div class="hero">
+      <div class="hero-grid">
+
+        <!-- Text -->
+        <div>
+          <div class="hero-eyebrow">
+            <div class="dot"></div>
+            <span data-tr="Android Uygulaması" data-en="Android App">Android Uygulaması</span>
+          </div>
+
+          <h1>
+            <span data-tr="Telefon Kilitli" data-en="Phone Locked">Telefon Kilitli</span><br>
+            <span class="ac" data-tr="Işık Konuşsun" data-en="Light Speaks">Işık Konuşsun</span>
+          </h1>
+
+          <p class="hero-sub" data-tr="Bildirimleri kamera flaşı ve ekran kenarı neon animasyonlarıyla algıla. Artık ekranı açmana gerek yok." data-en="Detect notifications with camera flash and edge glow animations. No need to unlock your phone anymore.">
+            Bildirimleri kamera flaşı ve ekran kenarı neon animasyonlarıyla algıla. Artık ekranı açmana gerek yok.
+          </p>
+
+          <div class="hero-btns">
+            <a href="#" class="btn-main" data-tr="▶ Google Play'den İndir" data-en="▶ Download on Google Play">▶ Google Play'den İndir</a>
+            <a href="#features" class="btn-sec" data-tr="Özellikleri Keşfet" data-en="Explore Features">Özellikleri Keşfet</a>
+          </div>
+
+          <div class="hero-stats">
+            <div>
+              <div class="stat-val">12</div>
+              <div class="stat-lbl" data-tr="Flash Deseni" data-en="Flash Patterns">Flash Deseni</div>
+            </div>
+            <div>
+              <div class="stat-val">11</div>
+              <div class="stat-lbl" data-tr="Glow Animasyon" data-en="Glow Animations">Glow Animasyon</div>
+            </div>
+            <div>
+              <div class="stat-val">0ms</div>
+              <div class="stat-lbl" data-tr="Gecikme" data-en="Delay">Gecikme</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone mockup -->
+        <div class="phone-wrap">
+          <div class="orbit"><div class="orb-dot"></div></div>
+          <div class="orbit2"><div class="orb-dot"></div></div>
+          <div class="phone">
+            <div class="phone-screen">
+              <!-- Kamera + glow ringler -->
+              <div class="camera-area">
+                <div class="glow-edge ge3"></div>
+                <div class="glow-edge ge2"></div>
+                <div class="glow-edge ge1"></div>
+                <div class="camera-bump">
+                  <div class="camera-lens"></div>
+                  <div class="camera-shine"></div>
+                </div>
+              </div>
+
+              <!-- WhatsApp notif -->
+              <div class="notif-card">
+                <div class="nc-app">
+                  <div class="nc-dot" style="background:#25D366;box-shadow:0 0 6px #25D366;"></div>
+                  WhatsApp
+                </div>
+                <div class="nc-txt" data-tr="Yeni mesajınız var 💬" data-en="You have a new message 💬">Yeni mesajınız var 💬</div>
+                <div class="nc-time">now</div>
+              </div>
+
+              <!-- Flash dot -->
+              <div class="flash-indicator"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════ FEATURES ═══════════════════════════════════ -->
+<section id="features">
+  <div class="wrap z">
+    <div class="sec-eyebrow" data-tr="Özellikler" data-en="Features">Özellikler</div>
+    <h2 class="sec-title" data-tr="Her Bildirime Özel Tepki" data-en="Unique Response for Every Notification">Her Bildirime Özel Tepki</h2>
+    <p class="sec-sub" data-tr="Uygulama bazlı renk, desen ve animasyon seçimiyle hiçbir bildirimi kaçırma." data-en="Never miss a notification with per-app color, pattern and animation settings.">
+      Uygulama bazlı renk, desen ve animasyon seçimiyle hiçbir bildirimi kaçırma.
+    </p>
+
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-ico">🔦</div>
+        <h3 data-tr="Kamera Flaşı" data-en="Camera Flash">Kamera Flaşı</h3>
+        <p data-tr="Slow, Fast, SOS, Heartbeat dahil 12 farklı flaş deseni. Her uygulama için ayrı pattern." data-en="12 flash patterns including Slow, Fast, SOS, Heartbeat. Individual pattern per app.">Slow, Fast, SOS, Heartbeat dahil 12 farklı flaş deseni. Her uygulama için ayrı pattern.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-ico">✨</div>
+        <h3 data-tr="Glow Animasyon" data-en="Glow Animation">Glow Animasyon</h3>
+        <p data-tr="Neon Ring, Plasma, Comet, Sparks ve 7 animasyon daha. Kilit ekranında çalışır." data-en="Neon Ring, Plasma, Comet, Sparks and 7 more. Works on lock screen.">Neon Ring, Plasma, Comet, Sparks ve 7 animasyon daha. Kilit ekranında çalışır.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-ico">🎨</div>
+        <h3 data-tr="Renk Paleti" data-en="Color Palette">Renk Paleti</h3>
+        <p data-tr="Her uygulama için özel renk. Cevapsız arama otomatik kırmızı." data-en="Custom color per app. Missed calls automatically red.">Her uygulama için özel renk. Cevapsız arama otomatik kırmızı.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-ico">⏰</div>
+        <h3 data-tr="Saat Aralığı" data-en="Time Range">Saat Aralığı</h3>
+        <p data-tr="Flash ve glow için bağımsız zamanlama. Gece saatlerinde otomatik kapanır." data-en="Independent scheduling for flash and glow. Auto-off at night.">Flash ve glow için bağımsız zamanlama. Gece saatlerinde otomatik kapanır.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-ico">📱</div>
+        <h3 data-tr="Uygulama Filtresi" data-en="App Filter">Uygulama Filtresi</h3>
+        <p data-tr="Hangi uygulamalar ışık yaksın seç. Tam kontrol sende." data-en="Choose which apps trigger the light. Full control is yours.">Hangi uygulamalar ışık yaksın seç. Tam kontrol sende.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-ico">🔇</div>
+        <h3 data-tr="Mod Ayarları" data-en="Mode Settings">Mod Ayarları</h3>
+        <p data-tr="Titreşim ve sessiz modda flash/glow davranışını ayrı ayrı yapılandır." data-en="Configure flash/glow behavior in vibrate and silent mode separately.">Titreşim ve sessiz modda flash/glow davranışını ayrı ayrı yapılandır.</p>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div style="margin-top:64px;">
+      <div class="sec-eyebrow" data-tr="Nasıl Çalışır" data-en="How It Works">Nasıl Çalışır</div>
+      <h2 class="sec-title" data-tr="3 Adımda Hazır" data-en="Ready in 3 Steps">3 Adımda Hazır</h2>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-n">01</div>
+        <h4 data-tr="İndir & İzinleri Ver" data-en="Download & Grant Permissions">İndir & İzinleri Ver</h4>
+        <p data-tr="Google Play'den indir. Bildirim erişimi, ekran üzerine gösterim ve pil optimizasyonu izinlerini ver." data-en="Download from Google Play. Grant notification access, overlay and battery optimization permissions.">Google Play'den indir. Bildirim erişimi, ekran üzerine gösterim ve pil optimizasyonu izinlerini ver.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">02</div>
+        <h4 data-tr="Uygulamaları & Renkleri Seç" data-en="Select Apps & Colors">Uygulamaları & Renkleri Seç</h4>
+        <p data-tr="Hangi uygulamalar tetiklesin, renk ve flash deseni seç. Her uygulama için farklı ayar." data-en="Choose which apps trigger lights, pick colors and flash patterns. Different settings per app.">Hangi uygulamalar tetiklesin, renk ve flash deseni seç. Her uygulama için farklı ayar.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">03</div>
+        <h4 data-tr="Kilitle & Bekle" data-en="Lock & Wait">Kilitle & Bekle</h4>
+        <p data-tr="Telefonu kilitle. Bildirim geldiğinde flaş ve glow animasyonu otomatik devreye girer." data-en="Lock your phone. When a notification arrives, flash and glow animation activate automatically.">Telefonu kilitle. Bildirim geldiğinde flaş ve glow animasyonu otomatik devreye girer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════ PREMIUM ═══════════════════════════════════ -->
+<section id="premium">
+  <div class="wrap z">
+    <div class="sec-eyebrow" data-tr="Premium" data-en="Premium">Premium</div>
+    <h2 class="sec-title" data-tr="Tüm Özelliklerin Kilidi" data-en="Unlock Everything">Tüm Özelliklerin Kilidi</h2>
+    <p class="sec-sub" data-tr="Tek seferlik ödeme, ömür boyu kullanım." data-en="One-time payment, lifetime access.">Tek seferlik ödeme, ömür boyu kullanım.</p>
+
+    <div class="prem-grid">
+      <div class="prem-list">
+        <div class="pi">
+          <div class="pi-ico">🎬</div>
+          <div>
+            <h4 data-tr="11 Glow Animasyonu" data-en="11 Glow Animations">11 Glow Animasyonu</h4>
+            <p data-tr="Neon Ring, Plasma, Comet, Morph, Sparks, Wave, Eyes, Breath ve Stars dahil tümü." data-en="All including Neon Ring, Plasma, Comet, Morph, Sparks, Wave, Eyes, Breath and Stars.">Neon Ring, Plasma, Comet, Morph, Sparks, Wave, Eyes, Breath ve Stars dahil tümü.</p>
+          </div>
+        </div>
+        <div class="pi">
+          <div class="pi-ico">🎨</div>
+          <div>
+            <h4 data-tr="Özel Renk Seçimi" data-en="Custom Color Picker">Özel Renk Seçimi</h4>
+            <p data-tr="Her uygulama için renk paleti. Gradient ve çoklu renk desteği." data-en="Color palette per app. Gradient and multi-color support.">Her uygulama için renk paleti. Gradient ve çoklu renk desteği.</p>
+          </div>
+        </div>
+        <div class="pi">
+          <div class="pi-ico">⚡</div>
+          <div>
+            <h4 data-tr="Tüm Flash Desenleri" data-en="All Flash Patterns">Tüm Flash Desenleri</h4>
+            <p data-tr="12 desenin tamamı — SOS, Morse Hi, Lighthouse, Heartbeat dahil." data-en="All 12 patterns — including SOS, Morse Hi, Lighthouse, Heartbeat.">12 desenin tamamı — SOS, Morse Hi, Lighthouse, Heartbeat dahil.</p>
+          </div>
+        </div>
+        <div class="pi">
+          <div class="pi-ico">⏰</div>
+          <div>
+            <h4 data-tr="Saat Aralığı Ayarı" data-en="Time Range Settings">Saat Aralığı Ayarı</h4>
+            <p data-tr="Flash ve glow için bağımsız zaman dilimleri." data-en="Independent time slots for flash and glow.">Flash ve glow için bağımsız zaman dilimleri.</p>
+          </div>
+        </div>
+        <div class="pi">
+          <div class="pi-ico">🔔</div>
+          <div>
+            <h4 data-tr="Uygulama Bazlı Pattern" data-en="Per-App Pattern">Uygulama Bazlı Pattern</h4>
+            <p data-tr="Her uygulama için ayrı flash deseni seçimi." data-en="Individual flash pattern selection per app.">Her uygulama için ayrı flash deseni seçimi.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="price-card">
+        <div style="font-size:10px;color:var(--mt);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;" data-tr="Tek Seferlik" data-en="One Time">Tek Seferlik</div>
+        <div class="price-tag">₺XX</div>
+        <div class="price-note" data-tr="Ömür boyu · 1 cihaz · Anında aktivasyon" data-en="Lifetime · 1 device · Instant activation">Ömür boyu · 1 cihaz · Anında aktivasyon</div>
+
+        <div class="pf-list">
+          <div class="pf" data-tr="Tüm glow animasyonları" data-en="All glow animations">Tüm glow animasyonları</div>
+          <div class="pf" data-tr="Özel renk seçimi" data-en="Custom color picker">Özel renk seçimi</div>
+          <div class="pf" data-tr="Tüm flash desenleri" data-en="All flash patterns">Tüm flash desenleri</div>
+          <div class="pf" data-tr="Saat aralığı ayarı" data-en="Time range settings">Saat aralığı ayarı</div>
+          <div class="pf" data-tr="Uygulama bazlı pattern" data-en="Per-app patterns">Uygulama bazlı pattern</div>
+        </div>
+
+        <a href="/cdn-cgi/l/email-protection#e884818f809c8b899b8da88f85898184c68b8785d79b9d8a828d8b9cd5b89a8d85819d85cddad8b89d9a8b80899b8d" class="btn-main" style="width:100%;justify-content:center;font-size:10px;" data-tr="Satın Al →" data-en="Buy Now →">Satın Al →</a>
+        <div class="badge-free" data-tr="✓ Temel özellikler ücretsiz" data-en="✓ Basic features are free">✓ Temel özellikler ücretsiz</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════ FOOTER ═══════════════════════════════════ -->
+<footer>
+  <div class="wrap z">
+    <p style="margin-bottom:8px;">
+      <a href="#" class="logo" style="font-size:15px;">LIGHT<em style="color:rgba(0,229,255,0.35);font-style:normal;">CASE</em></a>
+    </p>
+    <p>© 2025 LightCase · <a href="/cdn-cgi/l/email-protection#bbd7d2dcd3cfd8dac8defbdcd6dad2d795d8d4d6"><span class="__cf_email__" data-cfemail="1d71747a75697e7c6e785d7a707c7471337e7270">[email&#160;protected]</span></a></p>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+var lang = 'tr';
+
+function toggleLang(){
+  lang = lang === 'tr' ? 'en' : 'tr';
+  document.querySelectorAll('[data-tr]').forEach(function(el){
+    el.textContent = el.getAttribute('data-' + lang);
+  });
+  document.documentElement.lang = lang;
+}
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click', function(e){
+    var target = document.querySelector(this.getAttribute('href'));
+    if(target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth'}); }
+  });
+});
+
+// Staggered reveal on scroll
+var observer = new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if(entry.isIntersecting){
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, {threshol

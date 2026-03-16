@@ -1,0 +1,2 @@
+# Lica
+Lica-Bildirim Uygulaması

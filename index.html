@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -215,60 +214,55 @@ h1 .ac{
 .camera-area{
   position:absolute;
   top:16px;
+  left:50%;
+  transform:translateX(-50%);
   display:flex;align-items:center;justify-content:center;
   z-index:10;
 }
 .camera-bump{
-  width:48px;height:48px;
+  width:28px;height:28px;
   border-radius:50%;
   background:var(--bg2);
   border:2px solid var(--bd2);
   display:flex;align-items:center;justify-content:center;
   position:relative;
+  z-index:15;
 }
 .camera-lens{
-  width:22px;height:22px;
+  width:14px;height:14px;
   border-radius:50%;
   background:radial-gradient(circle at 35% 35%, #1a2a3a, #050810);
-  border:1.5px solid #1E3040;
-  box-shadow:inset 0 0 6px rgba(0,229,255,0.15);
+  border:1px solid #1E3040;
+  box-shadow:inset 0 0 4px rgba(0,229,255,0.15);
 }
 .camera-shine{
   position:absolute;
-  top:5px;left:8px;
-  width:6px;height:6px;
+  top:4px;left:5px;
+  width:3px;height:3px;
   border-radius:50%;
   background:rgba(0,229,255,0.4);
-  filter:blur(2px);
+  filter:blur(1px);
 }
 
-/* glow rings sadece kamera etrafında */
+/* glow rings - artık sadece placeholder, canvas çizecek */
 .glow-edge{
   position:absolute;
   border-radius:50%;
   pointer-events:none;
-}
-.ge1{
-  width:64px;height:64px;
-  border:2px solid var(--c);
-  animation:ge 2.2s ease-in-out infinite;
-}
-.ge2{
-  width:82px;height:82px;
-  border:1.5px solid rgba(0,229,255,0.4);
-  animation:ge 2.2s ease-in-out infinite .25s;
-}
-.ge3{
-  width:104px;height:104px;
-  border:1px solid rgba(0,229,255,0.15);
-  animation:ge 2.2s ease-in-out infinite .5s;
-}
-@keyframes ge{
-  0%,100%{opacity:.6;box-shadow:0 0 8px rgba(0,229,255,0.3);}
-  50%{opacity:1;box-shadow:0 0 22px rgba(0,229,255,0.7);}
+  border:1px solid transparent; /* sadece placeholder */
 }
 
-/* notif card */
+/* Canvas - kamera etrafını tam saran konum */
+#glowCanvas {
+  position:absolute;
+  top:-30px;
+  left:-30px;
+  width:90px;
+  height:90px;
+  z-index:5;
+  pointer-events:none;
+}
+
 .notif-card{
   background:var(--bg3);
   border:1px solid var(--bd2);
@@ -289,32 +283,17 @@ h1 .ac{
 .nc-txt{font-size:12px;color:var(--tx);}
 .nc-time{font-size:9px;color:var(--mt);margin-top:3px;}
 
-/* flash indicator */
-.flash-indicator{
-  position:absolute;
-  bottom:18px;
-  width:36px;height:36px;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(255,255,255,0.9),rgba(255,220,100,0.6));
-  box-shadow:0 0 20px rgba(255,240,150,0.8),0 0 40px rgba(255,220,100,0.4);
-  animation:flash-blink 1.8s ease-in-out infinite;
-}
-@keyframes flash-blink{
-  0%,100%{opacity:.3;transform:scale(0.8);}
-  50%{opacity:1;transform:scale(1.1);}
-}
-
 /* orbiting dots */
 .orbit{
   position:absolute;
-  width:340px;height:340px;
+  width:240px;height:240px;
   border-radius:50%;
   border:1px dashed rgba(0,229,255,0.08);
   animation:spin 20s linear infinite;
 }
 .orbit2{
   position:absolute;
-  width:460px;height:460px;
+  width:320px;height:320px;
   border-radius:50%;
   border:1px dashed rgba(0,229,255,0.04);
   animation:spin 30s linear infinite reverse;
@@ -322,11 +301,11 @@ h1 .ac{
 @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .orb-dot{
   position:absolute;
-  width:7px;height:7px;
+  width:5px;height:5px;
   border-radius:50%;
   background:var(--c);
-  box-shadow:0 0 10px var(--c);
-  top:-3.5px;left:50%;transform:translateX(-50%);
+  box-shadow:0 0 6px var(--c);
+  top:-2.5px;left:50%;transform:translateX(-50%);
 }
 
 /* ═══════════════ DIVIDER ═══════════════ */
@@ -368,7 +347,7 @@ section{padding:88px 0;}
   background:var(--bg2);
   padding:30px 24px;
   transition:background .2s;
-  cursor:default;
+  cursor:pointer;
 }
 .feat:hover{background:var(--bg3);}
 .feat-ico{font-size:28px;margin-bottom:14px;}
@@ -547,11 +526,9 @@ footer a:hover{text-decoration:underline;}
           <div class="orbit2"><div class="orb-dot"></div></div>
           <div class="phone">
             <div class="phone-screen">
-              <!-- Kamera + glow ringler -->
+              <!-- Kamera + glow ringler - canvas ile çizilecek -->
               <div class="camera-area">
-                <div class="glow-edge ge3"></div>
-                <div class="glow-edge ge2"></div>
-                <div class="glow-edge ge1"></div>
+                <canvas id="glowCanvas" width="90" height="90"></canvas>
                 <div class="camera-bump">
                   <div class="camera-lens"></div>
                   <div class="camera-shine"></div>
@@ -567,9 +544,6 @@ footer a:hover{text-decoration:underline;}
                 <div class="nc-txt" data-tr="Yeni mesajınız var 💬" data-en="You have a new message 💬">Yeni mesajınız var 💬</div>
                 <div class="nc-time">now</div>
               </div>
-
-              <!-- Flash dot -->
-              <div class="flash-indicator"></div>
             </div>
           </div>
         </div>
@@ -591,35 +565,60 @@ footer a:hover{text-decoration:underline;}
     </p>
 
     <div class="feat-grid">
-      <div class="feat">
-        <div class="feat-ico">🔦</div>
-        <h3 data-tr="Kamera Flaşı" data-en="Camera Flash">Kamera Flaşı</h3>
-        <p data-tr="Slow, Fast, SOS, Heartbeat dahil 12 farklı flaş deseni. Her uygulama için ayrı pattern." data-en="12 flash patterns including Slow, Fast, SOS, Heartbeat. Individual pattern per app.">Slow, Fast, SOS, Heartbeat dahil 12 farklı flaş deseni. Her uygulama için ayrı pattern.</p>
+      <div class="feat" onclick="setAnimType('NEON_RING')">
+        <div class="feat-ico">🔮</div>
+        <h3 data-tr="Neon Ring" data-en="Neon Ring">Neon Ring</h3>
+        <p data-tr="Dönen neon halka efekti" data-en="Spinning neon ring effect">Dönen neon halka efekti</p>
       </div>
-      <div class="feat">
+      <div class="feat" onclick="setAnimType('BOUNCING_BALLS')">
+        <div class="feat-ico">🏀</div>
+        <h3 data-tr="Bouncing Balls" data-en="Bouncing Balls">Bouncing Balls</h3>
+        <p data-tr="Zıplayan toplar" data-en="Bouncing balls">Zıplayan toplar</p>
+      </div>
+      <div class="feat" onclick="setAnimType('PULSE')">
+        <div class="feat-ico">💓</div>
+        <h3 data-tr="Pulse" data-en="Pulse">Pulse</h3>
+        <p data-tr="Nabız atışı efekti" data-en="Heartbeat pulse effect">Nabız atışı efekti</p>
+      </div>
+      <div class="feat" onclick="setAnimType('COMET')">
+        <div class="feat-ico">☄️</div>
+        <h3 data-tr="Comet" data-en="Comet">Comet</h3>
+        <p data-tr="Kuyruklu yıldız efekti" data-en="Comet trail effect">Kuyruklu yıldız efekti</p>
+      </div>
+      <div class="feat" onclick="setAnimType('PLASMA')">
+        <div class="feat-ico">🌋</div>
+        <h3 data-tr="Plasma" data-en="Plasma">Plasma</h3>
+        <p data-tr="Akışkan plazma efekti" data-en="Fluid plasma effect">Akışkan plazma efekti</p>
+      </div>
+      <div class="feat" onclick="setAnimType('MORPH')">
+        <div class="feat-ico">⬛➡️⚪</div>
+        <h3 data-tr="Morph" data-en="Morph">Morph</h3>
+        <p data-tr="Kareden daireye dönüşüm" data-en="Square to circle morph">Kareden daireye dönüşüm</p>
+      </div>
+      <div class="feat" onclick="setAnimType('SPARKS')">
         <div class="feat-ico">✨</div>
-        <h3 data-tr="Glow Animasyon" data-en="Glow Animation">Glow Animasyon</h3>
-        <p data-tr="Neon Ring, Plasma, Comet, Sparks ve 7 animasyon daha. Kilit ekranında çalışır." data-en="Neon Ring, Plasma, Comet, Sparks and 7 more. Works on lock screen.">Neon Ring, Plasma, Comet, Sparks ve 7 animasyon daha. Kilit ekranında çalışır.</p>
+        <h3 data-tr="Sparks" data-en="Sparks">Sparks</h3>
+        <p data-tr="Kıvılcım patlaması" data-en="Spark burst">Kıvılcım patlaması</p>
       </div>
-      <div class="feat">
-        <div class="feat-ico">🎨</div>
-        <h3 data-tr="Renk Paleti" data-en="Color Palette">Renk Paleti</h3>
-        <p data-tr="Her uygulama için özel renk. Cevapsız arama otomatik kırmızı." data-en="Custom color per app. Missed calls automatically red.">Her uygulama için özel renk. Cevapsız arama otomatik kırmızı.</p>
+      <div class="feat" onclick="setAnimType('WAVE')">
+        <div class="feat-ico">🌊</div>
+        <h3 data-tr="Wave" data-en="Wave">Wave</h3>
+        <p data-tr="Sinüs dalgası" data-en="Sine wave">Sinüs dalgası</p>
       </div>
-      <div class="feat">
-        <div class="feat-ico">⏰</div>
-        <h3 data-tr="Saat Aralığı" data-en="Time Range">Saat Aralığı</h3>
-        <p data-tr="Flash ve glow için bağımsız zamanlama. Gece saatlerinde otomatik kapanır." data-en="Independent scheduling for flash and glow. Auto-off at night.">Flash ve glow için bağımsız zamanlama. Gece saatlerinde otomatik kapanır.</p>
+      <div class="feat" onclick="setAnimType('EYES')">
+        <div class="feat-ico">👀</div>
+        <h3 data-tr="Eyes" data-en="Eyes">Eyes</h3>
+        <p data-tr="Göz kırpan gözler" data-en="Blinking eyes">Göz kırpan gözler</p>
       </div>
-      <div class="feat">
-        <div class="feat-ico">📱</div>
-        <h3 data-tr="Uygulama Filtresi" data-en="App Filter">Uygulama Filtresi</h3>
-        <p data-tr="Hangi uygulamalar ışık yaksın seç. Tam kontrol sende." data-en="Choose which apps trigger the light. Full control is yours.">Hangi uygulamalar ışık yaksın seç. Tam kontrol sende.</p>
+      <div class="feat" onclick="setAnimType('BREATH')">
+        <div class="feat-ico">🧘</div>
+        <h3 data-tr="Breath" data-en="Breath">Breath</h3>
+        <p data-tr="4-7-8 nefes ritmi" data-en="4-7-8 breathing rhythm">4-7-8 nefes ritmi</p>
       </div>
-      <div class="feat">
-        <div class="feat-ico">🔇</div>
-        <h3 data-tr="Mod Ayarları" data-en="Mode Settings">Mod Ayarları</h3>
-        <p data-tr="Titreşim ve sessiz modda flash/glow davranışını ayrı ayrı yapılandır." data-en="Configure flash/glow behavior in vibrate and silent mode separately.">Titreşim ve sessiz modda flash/glow davranışını ayrı ayrı yapılandır.</p>
+      <div class="feat" onclick="setAnimType('STARS')">
+        <div class="feat-ico">⭐</div>
+        <h3 data-tr="Stars" data-en="Stars">Stars</h3>
+        <p data-tr="Dönen yıldızlar" data-en="Spinning stars">Dönen yıldızlar</p>
       </div>
     </div>
 
@@ -633,17 +632,17 @@ footer a:hover{text-decoration:underline;}
       <div class="step">
         <div class="step-n">01</div>
         <h4 data-tr="İndir & İzinleri Ver" data-en="Download & Grant Permissions">İndir & İzinleri Ver</h4>
-        <p data-tr="Google Play'den indir. Bildirim erişimi, ekran üzerine gösterim ve pil optimizasyonu izinlerini ver." data-en="Download from Google Play. Grant notification access, overlay and battery optimization permissions.">Google Play'den indir. Bildirim erişimi, ekran üzerine gösterim ve pil optimizasyonu izinlerini ver.</p>
+        <p data-tr="Google Play'den indir. Bildirim erişimi ve gerekli izinleri ver." data-en="Download from Google Play. Grant notification access and required permissions.">Google Play'den indir. Bildirim erişimi ve gerekli izinleri ver.</p>
       </div>
       <div class="step">
         <div class="step-n">02</div>
-        <h4 data-tr="Uygulamaları & Renkleri Seç" data-en="Select Apps & Colors">Uygulamaları & Renkleri Seç</h4>
-        <p data-tr="Hangi uygulamalar tetiklesin, renk ve flash deseni seç. Her uygulama için farklı ayar." data-en="Choose which apps trigger lights, pick colors and flash patterns. Different settings per app.">Hangi uygulamalar tetiklesin, renk ve flash deseni seç. Her uygulama için farklı ayar.</p>
+        <h4 data-tr="Uygulamaları Seç" data-en="Select Apps">Uygulamaları Seç</h4>
+        <p data-tr="Hangi uygulamaların ışık yakacağını seç." data-en="Choose which apps will trigger the light.">Hangi uygulamaların ışık yakacağını seç.</p>
       </div>
       <div class="step">
         <div class="step-n">03</div>
         <h4 data-tr="Kilitle & Bekle" data-en="Lock & Wait">Kilitle & Bekle</h4>
-        <p data-tr="Telefonu kilitle. Bildirim geldiğinde flaş ve glow animasyonu otomatik devreye girer." data-en="Lock your phone. When a notification arrives, flash and glow animation activate automatically.">Telefonu kilitle. Bildirim geldiğinde flaş ve glow animasyonu otomatik devreye girer.</p>
+        <p data-tr="Telefonu kilitle. Bildirim geldiğinde animasyonlar otomatik başlar." data-en="Lock your phone. Animations start automatically when notifications arrive.">Telefonu kilitle. Bildirim geldiğinde animasyonlar otomatik başlar.</p>
       </div>
     </div>
   </div>
@@ -671,28 +670,14 @@ footer a:hover{text-decoration:underline;}
           <div class="pi-ico">🎨</div>
           <div>
             <h4 data-tr="Özel Renk Seçimi" data-en="Custom Color Picker">Özel Renk Seçimi</h4>
-            <p data-tr="Her uygulama için renk paleti. Gradient ve çoklu renk desteği." data-en="Color palette per app. Gradient and multi-color support.">Her uygulama için renk paleti. Gradient ve çoklu renk desteği.</p>
+            <p data-tr="Her uygulama için renk paleti." data-en="Color palette per app.">Her uygulama için renk paleti.</p>
           </div>
         </div>
         <div class="pi">
           <div class="pi-ico">⚡</div>
           <div>
             <h4 data-tr="Tüm Flash Desenleri" data-en="All Flash Patterns">Tüm Flash Desenleri</h4>
-            <p data-tr="12 desenin tamamı — SOS, Morse Hi, Lighthouse, Heartbeat dahil." data-en="All 12 patterns — including SOS, Morse Hi, Lighthouse, Heartbeat.">12 desenin tamamı — SOS, Morse Hi, Lighthouse, Heartbeat dahil.</p>
-          </div>
-        </div>
-        <div class="pi">
-          <div class="pi-ico">⏰</div>
-          <div>
-            <h4 data-tr="Saat Aralığı Ayarı" data-en="Time Range Settings">Saat Aralığı Ayarı</h4>
-            <p data-tr="Flash ve glow için bağımsız zaman dilimleri." data-en="Independent time slots for flash and glow.">Flash ve glow için bağımsız zaman dilimleri.</p>
-          </div>
-        </div>
-        <div class="pi">
-          <div class="pi-ico">🔔</div>
-          <div>
-            <h4 data-tr="Uygulama Bazlı Pattern" data-en="Per-App Pattern">Uygulama Bazlı Pattern</h4>
-            <p data-tr="Her uygulama için ayrı flash deseni seçimi." data-en="Individual flash pattern selection per app.">Her uygulama için ayrı flash deseni seçimi.</p>
+            <p data-tr="12 desenin tamamı." data-en="All 12 patterns.">12 desenin tamamı.</p>
           </div>
         </div>
       </div>
@@ -700,17 +685,9 @@ footer a:hover{text-decoration:underline;}
       <div class="price-card">
         <div style="font-size:10px;color:var(--mt);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;" data-tr="Tek Seferlik" data-en="One Time">Tek Seferlik</div>
         <div class="price-tag">₺XX</div>
-        <div class="price-note" data-tr="Ömür boyu · 1 cihaz · Anında aktivasyon" data-en="Lifetime · 1 device · Instant activation">Ömür boyu · 1 cihaz · Anında aktivasyon</div>
+        <div class="price-note" data-tr="Ömür boyu · 1 cihaz" data-en="Lifetime · 1 device">Ömür boyu · 1 cihaz</div>
 
-        <div class="pf-list">
-          <div class="pf" data-tr="Tüm glow animasyonları" data-en="All glow animations">Tüm glow animasyonları</div>
-          <div class="pf" data-tr="Özel renk seçimi" data-en="Custom color picker">Özel renk seçimi</div>
-          <div class="pf" data-tr="Tüm flash desenleri" data-en="All flash patterns">Tüm flash desenleri</div>
-          <div class="pf" data-tr="Saat aralığı ayarı" data-en="Time range settings">Saat aralığı ayarı</div>
-          <div class="pf" data-tr="Uygulama bazlı pattern" data-en="Per-app patterns">Uygulama bazlı pattern</div>
-        </div>
-
-        <a href="/cdn-cgi/l/email-protection#e884818f809c8b899b8da88f85898184c68b8785d79b9d8a828d8b9cd5b89a8d85819d85cddad8b89d9a8b80899b8d" class="btn-main" style="width:100%;justify-content:center;font-size:10px;" data-tr="Satın Al →" data-en="Buy Now →">Satın Al →</a>
+        <a href="#" class="btn-main" style="width:100%;justify-content:center;font-size:10px;" data-tr="Satın Al →" data-en="Buy Now →">Satın Al →</a>
         <div class="badge-free" data-tr="✓ Temel özellikler ücretsiz" data-en="✓ Basic features are free">✓ Temel özellikler ücretsiz</div>
       </div>
     </div>
@@ -723,11 +700,12 @@ footer a:hover{text-decoration:underline;}
     <p style="margin-bottom:8px;">
       <a href="#" class="logo" style="font-size:15px;">LIGHT<em style="color:rgba(0,229,255,0.35);font-style:normal;">CASE</em></a>
     </p>
-    <p>© 2025 LightCase · <a href="/cdn-cgi/l/email-protection#bbd7d2dcd3cfd8dac8defbdcd6dad2d795d8d4d6"><span class="__cf_email__" data-cfemail="1d71747a75697e7c6e785d7a707c7471337e7270">[email&#160;protected]</span></a></p>
+    <p>© 2025 LightCase · <a href="/cdn-cgi/l/email-protection#9ef2f7f9f6eafffdeff9def9f3fff7f2b0fdf1f3"><span class="__cf_email__" data-cfemail="24484d434c5045475543644349454d480a474b49">[email&#160;protected]</span></a></p>
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
+// Dil değiştirme fonksiyonu
 var lang = 'tr';
 
 function toggleLang(){
@@ -746,6 +724,607 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a){
   });
 });
 
+// ==================== GLOW EDGE ANIMATIONS - KAMERA ETRAFINDA ====================
+
+const canvas = document.getElementById('glowCanvas');
+const ctx = canvas.getContext('2d');
+
+// Canvas boyutları - kamera merkezi canvasın ortasında
+const canvasSize = 90;
+canvas.width = canvasSize;
+canvas.height = canvasSize;
+
+// Kamera merkezi (canvas'ın tam ortası)
+const centerX = canvasSize / 2;
+const centerY = canvasSize / 2;
+const radius = 18; // Küçültülmüş kamera yarıçapı
+
+// Renk paleti
+const colors = [
+  0x00E5FF,  // Mavi neon
+  0xFF1493,  // Pembe
+  0xFFD700,  // Altın sarısı
+  0xAA00FF,  // Mor
+  0x00FF88,  // Yeşil
+  0xFF3D55,  // Kırmızı
+  0xFF9500,  // Turuncu
+  0x4169E1,  // Kraliyet mavisi
+  0x32CD32,  // Lime yeşili
+  0xFF69B4,  // Sıcak pembe
+  0x00FFFF   // Cyan
+];
+
+// Animasyon tipi ve sayaç
+let animType = 'NEON_RING';
+let animTime = 0;
+let currentAnimIndex = 0;
+
+// Animasyon tipleri
+const animations = [
+  'NEON_RING', 'BOUNCING_BALLS', 'PULSE', 'COMET', 'PLASMA', 
+  'MORPH', 'SPARKS', 'WAVE', 'EYES', 'BREATH', 'STARS'
+];
+
+// Yardımcı fonksiyonlar
+function colorAt(index) {
+  return colors[Math.abs(index) % colors.length];
+}
+
+function lerpColor(c1, c2, t) {
+  const r1 = (c1 >> 16) & 0xFF;
+  const g1 = (c1 >> 8) & 0xFF;
+  const b1 = c1 & 0xFF;
+  const r2 = (c2 >> 16) & 0xFF;
+  const g2 = (c2 >> 8) & 0xFF;
+  const b2 = c2 & 0xFF;
+  
+  const r = Math.round(r1 * (1 - t) + r2 * t);
+  const g = Math.round(g1 * (1 - t) + g2 * t);
+  const b = Math.round(b1 * (1 - t) + b2 * t);
+  
+  return (r << 16) | (g << 8) | b;
+}
+
+// Animasyon tipini manuel değiştir
+function setAnimType(type) {
+  animType = type;
+  animTime = 0;
+}
+
+// Animasyon döngüsü - 3 saniyede bir tip değiştir
+function cycleAnimationType() {
+  animType = animations[currentAnimIndex];
+  currentAnimIndex = (currentAnimIndex + 1) % animations.length;
+  animTime = 0;
+  setTimeout(cycleAnimationType, 3000);
+}
+
+// ==================== ANİMASYON ÇİZİM FONKSİYONLARI ====================
+
+// NEON_RING
+function drawNeonRing() {
+  const rotation = animTime * 2.5;
+  const pulse = animTime * 0.035;
+  const stroke = 2 + Math.sin(pulse) * 1.5;
+  const color = colorAt(Math.floor(animTime / 30) % colors.length);
+  const colorHex = `#${color.toString(16).padStart(6, '0')}`;
+  
+  ctx.clearRect(0, 0, canvasSize, canvasSize);
+  
+  // Glow katmanı
+  ctx.shadowColor = colorHex;
+  ctx.shadowBlur = 20;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+  
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = colorHex;
+  ctx.lineWidth = stroke * 2;
+  ctx.globalAlpha = 0.7;
+  ctx.stroke();
+  
+  // Neon katmanı
+  ctx.shadowBlur = 10;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = colorHex;
+  ctx.lineWidth = stroke;
+  ctx.globalAlpha = 1.0;
+  ctx.stroke();
+  
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 1.0;
+}
+
+// BOUNCING_BALLS
+function drawBouncingBalls() {
+  const t = animTime * 0.08;
+  const groundY = centerY + radius + 15;
+  
+  ctx.clearRect(0, 0, canvasSize, canvasSize);
+  
+  for (let i = 0; i < 3; i++) {
+    const sinVal = Math.abs(Math.sin(t - i * 0.35));
+    let squash, stretch, currentY;
+    
+    if (sinVal < 0.15) {
+      squash = 1.25 - sinVal * 1.5;
+      stretch = 0.75 + sinVal * 1.5;
+      currentY = groundY;
+    } else {
+      squash = 0.9 + sinVal * 0.1;
+      stretch = 1.1 - sinVal * 0.1;
+      currentY = groundY - sinVal * 25;
+    }
+    
+    const col = colors[i % colors.length];
+    const colHex = `#${col.toString(16).padStart(6, '0')}`;
+    const xPos = centerX + (i - 1) * 15;
+    const rx = 7 * squash;
+    const ry = 7 * stretch;
+    
+    // Glow
+    ctx.shadowColor = colHex;
+    ctx.shadowBlur = 18;
+    ctx.beginPath();
+    ctx.ellipse(xPos, currentY, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fillStyle = colHex;
+    ctx.globalAlpha = 0.8;
+    ctx.fill();
+    
+    // Top
+    ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.ellipse(xPos, currentY, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fillStyle = colHex;
+    ctx.globalAlpha = 1.0;
+    ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 1.0;
+}
+
+// PULSE
+function drawPulse() {
+  const pulse = animTime * 0.04;
+  const col = colors[Math.floor(animTime / 40) % colors.length];
+  const colHex = `#${col.toString(16).padStart(6, '0')}`;
+  
+  ctx.clearRect(0, 0, canvasSize, canvasSize);
+  
+  for (let ring = 0; ring < 3; ring++) {
+    const t = Math.sin(pulse + ring * 1.1) * 0.5 + 0.5;
+    const r = radius + ring * 4 + t * 3;
+    const alpha = Math.max(220 - ring * 60 - t * 60, 30);
+    const stroke = 1.5 - ring * 0.3 + t * 0.8;
+    
+    ctx.shadowColor = colHex;
+    ctx.shadowBlur = 3 + ring * 2;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
+    ctx.strokeStyle = colHex;
+    ctx.lineWidth = stroke;
+    ctx.globalAlpha = alpha / 255;
+    ctx.stroke();
+  }
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 1.0;
+}
+
+// COMET
+function drawComet() {
+  const cometAngle = animTime * 4.5 * Math.PI / 180;
+  const col = colors[Math.floor(animTime / 40) % colors.length];
+  const colHex = `#${col.toString(16).padStart(6, '0')}`;
+  
+  ctx.clearRect(0, 0, canvasSize, canvasSize);
+  
+  // Kuyruk (yarım daire yayı)
+  ctx.shadowColor = colHex;
+  ctx.shadowBlur = 15;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, cometAngle - 2.35, cometAngle, false);
+  ctx.strokeStyle = colHex;
+  ctx.lineWidth = 4;
+  ctx.globalAlpha = 0.6;
+  ctx.stroke();
+  
+  // Ana çizgi
+  ctx.shadowBlur = 5;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, cometAngle - 2.35, cometAngle, false);
+  ctx.strokeStyle = colHex;
+  ctx.lineWidth = 2;
+  ctx.globalAlpha = 1.0;
+  ctx.stroke();
+  
+  // Kafa
+  const hx = centerX + radius * Math.cos(cometAngle);
+  const hy = centerY + radius * Math.sin(cometAngle);
+  
+  ctx.shadowColor = '#FFFFFF';
+  ctx.shadowBlur = 10;
+  ctx.beginPath();
+  ctx.arc(hx, hy, 2.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.globalAlpha = 1.0;
+  ctx.fill();
+  
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 1.0;
+}
+
+// PLASMA
+function drawPlasma() {
+  ctx.clearRect(0, 0, canvasSize, canvasSize);
+  
+  const blobCount = 4;
+  
+  for (let i = 0; i < blobCount; i++) {
+    const angle = animTime * 0.03 + i * 1.57;
+    const orbitR = radius * (0.85 + i * 0.1);
+    const bx = centerX + orbitR * Math.cos(angle);
+    const by = centerY + orbitR * 0.55 * Math.sin(angle);
+    
+    const colorT = Math.sin(animTime * 0.012 + i * 1.2) * 0.5 + 0.5;
+    const blobCol = lerpColor(colors[i % colors.length], colors[(i + 1) % colors.length], colorT);
+    const blobR = radius * (0.55 + 0.2 * Math.sin(animTime * 0.018 + i));
+    
+    // Radial gradient ile plazma efekti
+    const gradient = ctx.createRadialGradient(bx, by, 0, bx, by, blobR);
+    gradient.addColorStop(0, `rgba(${(blobCol >> 16) & 0xFF}, ${(blobCol >> 8) & 0xFF}, ${blobCol & 0xFF}, 0.8)`);
+    gradient.addColorStop(0.5, `rgba(${(blobCol >> 16) & 0xFF}, ${(blobCol >> 8) & 0xFF}, ${blobCol & 0xFF}, 0.3)`);
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    
+    ctx.shadowColor = `#${blobCol.toString(16).padStart(6, '0')}`;
+    ctx.shadowBlur = blobR * 0.4;
+    ctx.beginPath();
+    ctx.arc(bx, by, blobR, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.globalAlpha = 1.0;
+    ctx.fill();
+  }
+  
+  // Ana halka
+  const ringCol = colors[Math.floor(animTime / 60) % colors.length];
+  ctx.shadowColor = `#${ringCol.toString(16).padStart(6, '0')}`;
+  ctx.shadowBlur = 5;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = `rgba(${(ringCol >> 16) & 0xFF}, ${(ringCol >> 8) & 0xFF}, ${ringCol & 0xFF}, 0.3)`;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  
+  ctx.shadowBlur = 0;
+}
+
+// MORPH
+function drawMorph() {
+  const morphT = (Math.sin(animTime * 0.008) + 1) / 2;
+  const maxR = radius * 0.7;
+  
+  const tl = Math.min(morphT * 4, 1) * maxR;
+  const tr = Math.min(Math.max(morphT * 4 - 1, 0), 1) * maxR;
+  const br = Math.min(Math.max(morphT * 4 - 2, 0), 1) * maxR;
+  const bl = Math.min(Math.max(morphT * 4 - 3, 0), 1) * maxR;
+  
+  const colorPos = morphT * (colors.length - 1);
+  const ci = Math.floor(colorPos);
+  const cf = colorPos - ci;
+  const morphColor = lerpColor(colors[ci % colors.length], colors[(ci + 1) % colors.length], cf);
+  const colorHex = `#${morphColor.toString(16).padStart(6, '0')}`;
+  
+  const half = radius * 0.7;
+  const left = centerX - half;
+  const top = centerY - half;
+  const right = centerX + half;
+  const bottom = centerY + half;
+  
+  ctx.clearRect(0, 0, canvasSize, canvasSize);
+  
+  ctx.save();
+  ctx.translate(centerX, centerY);
+  ctx.rotate(morphT * Math.PI);
+  ctx.translate(-centerX, -centerY);
+  
+  // Glow
+  ctx.shadowColor = colorHex;
+  ctx.shadowBlur = 18;
+  ctx.beginPath();
+  drawRoundedRect(ctx, left, top, right - left, bottom - top, tl, tr, br, bl);
+  ctx.strokeStyle = `rgba(${(morphColor >> 16) & 0xFF}, ${(morphColor >> 8) & 0xFF}, ${morphColor & 0xFF}, 0.6)`;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  
+  // Ana çizgi
+  ctx.shadowBlur = 6;
+  ctx.beginPath();
+  drawRoundedRect(ctx, left, top, right - left, bottom - top, tl, tr, br, bl);
+  ctx.strokeStyle = colorHex;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  
+  ctx.restore();
+  ctx.shadowBlur = 0;
+}
+
+function drawRoundedRect(ctx, x, y, w, h, tl, tr, br, bl) {
+  ctx.beginPath();
+  ctx.moveTo(x + tl, y);
+  ctx.lineTo(x + w - tr, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + tr);
+  ctx.lineTo(x + w, y + h - br);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - br, y + h);
+  ctx.lineTo(x + bl, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - bl);
+  ctx.lineTo(x, y + tl);
+  ctx.quadraticCurveTo(x, y, x + tl, y);
+  ctx.closePath();
+}
+
+// SPARKS
+function drawSparks() {
+  ctx.clearRect(0, 0, canvasSize, canvasSize);
+  
+  for (let i = 0; i < 8; i++) {
+    const angle = animTime * 0.2 + i;
+    const dist = radius * (0.8 + 0.4 * Math.sin(animTime * 0.1 + i));
+    const x = centerX + dist * Math.cos(angle);
+    const y = centerY + dist * Math.sin(angle);
+    
+    const col = colors[i % colors.length];
+    const alpha = 0.5 + 0.5 * Math.sin(animTime * 0.2 + i);
+    
+    ctx.shadowColor = `#${col.toString(16).padStart(6, '0')}`;
+    ctx.shadowBlur = 6;
+    ctx.beginPath();
+    ctx.arc(x, y, 1.5 + alpha * 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${(col >> 16) & 0xFF}, ${(col >> 8) & 0xFF}, ${col & 0xFF}, ${alpha})`;
+    ctx.fill();
+  }
+  
+  ctx.shadowBlur = 0;
+}
+
+// WAVE
+function drawWave() {
+  const waveAngle = animTime * 0.1;
+  const wavePhase = animTime * 0.18;
+  const amplitude = radius * 0.5;
+  const radialOffset = amplitude * Math.sin(wavePhase);
+  
+  const r = radius + radialOffset;
+  const bx = centerX + r * Math.cos(waveAngle);
+  const by = centerY + r * Math.sin(waveAngle);
+  
+  const col = colors[Math.floor(waveAngle) % colors.length];
+  const colHex = `#${col.toString(16).padStart(6, '0')}`;
+  
+  ctx.clearRect(0, 0, canvasSize, canvasSize);
+  
+  // İz efekti
+  for (let i = 0; i < 15; i++) {
+    const trailAngle = waveAngle - i * 0.1;
+    const trailR = radius + amplitude * Math.sin(wavePhase - i * 0.5);
+    const tx = centerX + trailR * Math.cos(trailAngle);
+    const ty = centerY + trailR * Math.sin(trailAngle);
+    const alpha = 0.2 * (1 - i / 15);
+    
+    ctx.shadowColor = colHex;
+    ctx.shadowBlur = 5;
+    ctx.beginPath();
+    ctx.arc(tx, ty, 1.2, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${(col >> 16) & 0xFF}, ${(col >> 8) & 0xFF}, ${col & 0xFF}, ${alpha})`;
+    ctx.fill();
+  }
+  
+  // Top
+  ctx.shadowColor = colHex;
+  ctx.shadowBlur = 8;
+  ctx.beginPath();
+  ctx.arc(bx, by, 1.8, 0, Math.PI * 2);
+  ctx.fillStyle = colHex;
+  ctx.fill();
+  
+  // Çekirdek
+  ctx.shadowColor = '#FFFFFF';
+  ctx.shadowBlur = 3;
+  ctx.beginPath();
+  ctx.arc(bx, by, 0.8, 0, Math.PI * 2);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fill();
+  
+  ctx.shadowBlur = 0;
+}
+
+// EYES
+function drawEyes() {
+  const eyeRadius = radius * 0.5;
+  const leftX = centerX - radius * 0.6;
+  const rightX = centerX + radius * 0.6;
+  const eyeY = centerY;
+  const blink = Math.abs(Math.sin(animTime * 0.1)) < 0.1 ? 0.2 : 1;
+  
+  ctx.clearRect(0, 0, canvasSize, canvasSize);
+  
+  // Sol göz
+  ctx.shadowColor = '#E8E0D0';
+  ctx.shadowBlur = 10;
+  ctx.beginPath();
+  ctx.ellipse(leftX, eyeY, eyeRadius * 1.2, eyeRadius * blink, 0, 0, Math.PI * 2);
+  ctx.fillStyle = '#E8E0D0';
+  ctx.fill();
+  
+  // Sağ göz
+  ctx.beginPath();
+  ctx.ellipse(rightX, eyeY, eyeRadius * 1.2, eyeRadius * blink, 0, 0, Math.PI * 2);
+  ctx.fillStyle = '#E8E0D0';
+  ctx.fill();
+  
+  // Pupiller
+  const gazeX = Math.sin(animTime * 0.05) * eyeRadius * 0.3;
+  const gazeY = Math.cos(animTime * 0.07) * eyeRadius * 0.2;
+  
+  ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.arc(leftX + gazeX, eyeY + gazeY, eyeRadius * 0.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#000000';
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.arc(rightX + gazeX, eyeY + gazeY, eyeRadius * 0.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#000000';
+  ctx.fill();
+  
+  // Yansıma
+  ctx.beginPath();
+  ctx.arc(leftX + gazeX + 1.5, eyeY + gazeY - 1.5, 1.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.arc(rightX + gazeX + 1.5, eyeY + gazeY - 1.5, 1.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fill();
+}
+
+// BREATH
+function drawBreath() {
+  const breathFrame = animTime % 1140;
+  let scale = 1;
+  
+  if (breathFrame < 240) {
+    scale = 1 + 0.25 * (breathFrame / 240);
+  } else if (breathFrame < 660) {
+    scale = 1.25;
+  } else {
+    scale = 1.25 - 0.25 * ((breathFrame - 660) / 480);
+  }
+  
+  const glow = Math.sin(animTime * 0.01) * 0.5 + 0.5;
+  const col = colors[Math.floor(animTime * 0.003) % colors.length];
+  
+  ctx.clearRect(0, 0, canvasSize, canvasSize);
+  
+  ctx.save();
+  ctx.translate(centerX, centerY);
+  ctx.scale(scale, scale);
+  ctx.translate(-centerX, -centerY);
+  
+  // Glow
+  ctx.shadowColor = `#${col.toString(16).padStart(6, '0')}`;
+  ctx.shadowBlur = 20;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(${(col >> 16) & 0xFF}, ${(col >> 8) & 0xFF}, ${col & 0xFF}, ${0.2 + 0.2 * glow})`;
+  ctx.fill();
+  
+  ctx.restore();
+  ctx.shadowBlur = 0;
+}
+
+// STARS
+function drawStars() {
+  const starGlowTime = animTime * 0.072;
+  const starSz = radius * 0.5;
+  const spacing = starSz * 1.5;
+  
+  const baseY = centerY + radius + starSz * 0.6;
+  const starsX = [centerX - spacing, centerX, centerX + spacing];
+  
+  ctx.clearRect(0, 0, canvasSize, canvasSize);
+  
+  for (let i = 0; i < 3; i++) {
+    const glowT = Math.sin(starGlowTime + i * 1.57) * 0.5 + 0.5;
+    const spin = animTime * 0.05 * (i + 1);
+    
+    const fillColors = [0xFFFFFC00, 0x5B9BFF, 0xFFFFFC00];
+    const glowColors = [0xFFFFFC00, 0x2563EB, 0xFFFFFC00];
+    
+    const fillCol = fillColors[i];
+    const glowCol = glowColors[i];
+    
+    ctx.save();
+    ctx.translate(starsX[i], baseY);
+    ctx.rotate(spin);
+    ctx.translate(-starsX[i], -baseY);
+    
+    // Glow katmanları
+    for (let l = 0; l < 3; l++) {
+      const blur = 20 * (0.5 + 0.5 * glowT);
+      const alpha = 100 * (0.4 + 0.6 * glowT);
+      
+      ctx.shadowColor = `#${glowCol.toString(16).padStart(6, '0')}`;
+      ctx.shadowBlur = blur;
+      drawStar(ctx, starsX[i], baseY, starSz, starSz * 0.4);
+      ctx.fillStyle = `rgba(${(glowCol >> 16) & 0xFF}, ${(glowCol >> 8) & 0xFF}, ${glowCol & 0xFF}, ${alpha / 255})`;
+      ctx.fill();
+    }
+    
+    // Yıldız dolgusu
+    ctx.shadowBlur = 0;
+    drawStar(ctx, starsX[i], baseY, starSz, starSz * 0.4);
+    ctx.fillStyle = `#${fillCol.toString(16).padStart(6, '0')}`;
+    ctx.fill();
+    
+    // Çekirdek
+    ctx.shadowColor = '#FFFFFF';
+    ctx.shadowBlur = starSz * 0.3;
+    ctx.beginPath();
+    ctx.arc(starsX[i], baseY, starSz * 0.2, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${0.4 + 0.5 * glowT})`;
+    ctx.fill();
+    
+    ctx.restore();
+  }
+  
+  ctx.shadowBlur = 0;
+}
+
+function drawStar(ctx, cx, cy, outerR, innerR) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const angle = -Math.PI / 2 + i * Math.PI / 5;
+    const r = i % 2 === 0 ? outerR : innerR;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+}
+
+// ==================== ANA ÇİZİM DÖNGÜSÜ ====================
+
+function draw() {
+  animTime += 1;
+  
+  switch(animType) {
+    case 'NEON_RING': drawNeonRing(); break;
+    case 'BOUNCING_BALLS': drawBouncingBalls(); break;
+    case 'PULSE': drawPulse(); break;
+    case 'COMET': drawComet(); break;
+    case 'PLASMA': drawPlasma(); break;
+    case 'MORPH': drawMorph(); break;
+    case 'SPARKS': drawSparks(); break;
+    case 'WAVE': drawWave(); break;
+    case 'EYES': drawEyes(); break;
+    case 'BREATH': drawBreath(); break;
+    case 'STARS': drawStars(); break;
+    default: drawNeonRing();
+  }
+  
+  requestAnimationFrame(draw);
+}
+
+// Animasyonu başlat
+document.addEventListener('DOMContentLoaded', function() {
+  cycleAnimationType();
+  draw();
+});
+
 // Staggered reveal on scroll
 var observer = new IntersectionObserver(function(entries){
   entries.forEach(function(entry){
@@ -754,4 +1333,14 @@ var observer = new IntersectionObserver(function(entries){
       entry.target.style.transform = 'translateY(0)';
     }
   });
-}, {threshol
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.feat, .step, .pi').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
